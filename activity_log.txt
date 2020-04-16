@@ -1,0 +1,23 @@
+Wednesday 2/5:
+  - Lisp review bc it's been a while
+  - Started brainstorming algorithm structures in lisp
+Thursday 2/6:
+  - received lisp and scheme starter code from prof. hunsberger
+Tuesday 2/11:
+  - initialized cs382 git repo
+Monday 2/17:
+  - brainstorm plan for implementing Morris' 2006 DC-Checking algorithm
+Tuesday 2/18:
+  - figure out how to parse input stnu files
+Thurday 2/20:
+  - generate new stnu from parsed inputs
+Thursday 2/27:
+  - in class: worry about lack of progress on implementation
+
+~ some days ~
+
+4/10/20:
+  - add minimum heap implementation of queue
+4/11/20:
+  - write results of tests to output file
+  - update README and activity_log
