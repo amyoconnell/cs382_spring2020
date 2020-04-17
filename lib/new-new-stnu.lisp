@@ -188,7 +188,7 @@ COMMON INTERNAL REPRESENTATIONS:  NU-STNU
 	      ; :initform (make-num-vector)
 	      :initarg :num-succs)
 
-   ;;  SUCCS ... an N-by-N array, where the ith row is viewed as an
+   ;;  SUCCS ... an N-by-N array, where the ith row is an
    ;;               N-element vector whose first NUM-SUCCS[i]
    ;;               elements contain SUCC structs specifying the
    ;;               successor/destination time-point and the weight of

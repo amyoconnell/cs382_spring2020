@@ -4,6 +4,7 @@
 ;; ====================================
 ;;  This file contains functions needed to parse a .stnu file
 ;;  into an instance of the NU-STNU class
+;;  for morris's 2014 DC-checking algorithm
 ;; =========================================================
 
 
