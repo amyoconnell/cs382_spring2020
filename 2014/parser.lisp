@@ -14,7 +14,7 @@
   (stnu ord-edges-list)
   (let* ((n (num-tps stnu))
         (orig-n n)
-        (tp-names (tp-names-vec))
+        (tp-names (tp-names-vec stnu))
         (m (num-ord-edges stnu))
         (k (num-cls stnu))
         (cont-link-veck (cl-vec stnu))
@@ -24,8 +24,7 @@
     (dotimes (i k)
              (let* ((cont-link (svref cont-link-veck i))
                     (atp (first cont-link))
-                    (already-used? (svref atp-vec atp))
-                    )
+                    (already-used? (svref atp-vec atp)))
                (cond
                  ;; Case 1:  That TP is an ATP for a previously encountered cont link
                  (already-used?
@@ -84,15 +83,13 @@
         (t
          (setf new-names-vec tp-names)))
 
-      (format t "ATP-vec: ~A~%" atp-vec)
-      ;; return
-      (list n new-names-vec (length ord-edges-list) ord-edges-list k cont-link-veck)
       (setf (cl-index-vec stnu) atp-vec)
       (setf (num-tps stnu) n)
       (setf (tp-names-vec stnu) new-names-vec)
       (setf (num-ord-edges stnu) (length ord-edges-list))
       (setf (negative-tp-vec stnu) (make-array n))
       (setf (tp-status-vec stnu) (make-array n))
+      (setf (ord-edges stnu) (make-array (list n n)))
       ;; TODO: implement this
       (add-ord-edges stnu ord-edges-list)
 
@@ -192,6 +189,51 @@
              ; use wrapper to add new edge to ETC
              (add-ord-edge stnu from-i to-i (second line-list)))))
 
+;;  PARSE-ORD-EDGES
+;; ---------------------------------------
+;;  helper function to collect edges from .stnu in a list
+;; ---------------------------------------
+;;  INPUT:  STNU: instance of NU-STNU
+;;          INPUT: .stnu stream
+;;  OUTPUT: a list of lists representing ordinary edges (FROM WT TO)
+
+(defun parse-ord-edges (stnu input)
+  (let ((ord-edge-list nil))
+  (dotimes (i (num-ord-edges stnu)) ; iterate through each ORD-EDGE in .stnu
+  (let* (
+        ; LINE = next line in .stnu as string (ex: "A 5 C")
+        (line (read-line input nil))
+        ; LINE-LIST = LINE converted to list (ex: '(A 5 C))
+         (line-list (string-to-list line))
+         ; FROM-I, TO-I = TP indexes for FROM and TO TPs
+         (from-i (gethash (first line-list) (tp-hash stnu)))
+         (to-i (gethash (third line-list) (tp-hash stnu))))
+             ; use wrapper to add new edge to list
+             (cons
+               (list from-i (second line-list) to-i)
+               ord-edge-list)))
+    ord-edge-list))
+
+;;  ADD-ORD-EDGES
+;; ---------------------------------------
+;;  helper function to add edges from list to NU-STNU instance
+;; ---------------------------------------
+;;  INPUT:  STNU: instance of NU-STNU
+;;          ORD-EDGES-LIST: list of edges (FROM WT TO)
+;;  OUTPUT: meh
+;;  SIDE EFFECT: destructively modifies ORD-EDGES field of STNU
+;;      to contain an N by N matrix of EDGE structs
+;;      destructively modifies NEGATIVE-TP-VEC of STNU to
+;;      contain t at all indices of negative TPS
+
+(defun add-ord-edges (stnu ord-edges-list)
+  (dolist (edgie ord-edges-list)
+    ;; add edge to stnu matrix
+    (add-ord-edge stnu (first edgie) (third edgie) (second edgie))
+    ;; if negative, set TO TP to negative in negative TP vec
+    (if (< 0 (second edgie))
+      (setf (aref (negative-tp-vec stnu) to) t))))
+
 ;;  CONT-LINKS-HELPER
 ;; ---------------------------------------
 ;;  helper function to add cont. links from .stnu to NU-STNU instance
@@ -199,16 +241,12 @@
 ;;  INPUT:  STNU: instance of NU-STNU
 ;;          INPUT: .stnu stream
 ;;  OUTPUT: meh
-;;  SIDE EFFECT: produces new vector of K CONT-LINK structs, destructively sets
-;;    STNU's CL-VEC to new vector.
-;;    Produces new vector of length NUM-TPS with CL-indexes stored at the index
-;;    of contingent time point C for each CL, sets STNU's CL-INDEX-VEC.
-;;    Produces new UC-EDGES-ETC instance ETC with all UC edges from contingent
-;;    links in .stnu file, destructively sets UC-EDGES-ETC of STNU to ETC
+;;  SIDE EFFECT: destructively modifies STNU's CL-VEC to contain
+;;    K cont-link structs. Destructifly modifies STNU's cl-index-vec
+;;    by storing each CL's CL-VEC index at CL-INDEX-VEC index C
 
 (defun cont-links-helper (input stnu)
-  (let* ((uc-etc (make-uc-edges-etc (num-tps stnu) (num-cls stnu))) ; ETC = new EDGES-ETC struct
-         (line nil)
+  (let* ((line nil)
          (line-list nil)
          (a-i nil)
          (c-i nil))
@@ -223,16 +261,9 @@
              (setf c-i (gethash (fourth line-list) (tp-hash stnu)))
              ; make cont-link struct, add to STNU's CL-VEC at index CLI
              (setf (aref (cl-vec stnu) cli)
-                   (make-cont-link :a a-i :x (second line-list) :y (third line-list) :c c-i))
+                   (list a-i (second line-list) (third line-list) c-i))
              ; store CLI for new cont-link at index C-I in STNU's CL-INDEX-VEC
-             (setf (aref (cl-index-vec stnu) c-i) cli)
-             ; use wrapper to add new uc-edge to UC-ETC
-             (add-edge-uc uc-etc
-                          c-i    ; initial FROM TP is contingent TP C
-                          cli    ; list iterator CLI == current cl index
-                          (* -1 (third line-list)))) ; uc-weight is negative!!
-    ; change UC-EDGES-ETC of STNU from NIL to ETC
-    (setf (uc-edges-etc STNU) uc-etc)))
+             (setf (aref (cl-index-vec stnu) c-i) cli))))
 
 ;;  PARSE-FILE
 ;; ---------------------------------------
@@ -244,10 +275,20 @@
 ;;          WT: edge weight
 ;;  OUTPUT: meh
 ;;  SIDE EFFECT: destructively modifies ETC to contain a new edge (FROM WT TO)
+;
+; (let* ((n (num-tps stnu))
+;       (orig-n n)
+;       (tp-names (tp-names-vec))
+;       (m (num-ord-edges stnu))
+;       (k (num-cls stnu))
+;       (cont-link-veck (cl-vec stnu))
+;       (atp-vec (make-array (+ n k) :initial-element nil))
+;       (new-names ()))
 
 (defun parse-file (doc)
   (let* ((input (open doc))
-         (stnu (make-instance 'nu-stnu)))
+         (stnu (make-instance 'nu-stnu))
+         (ord-edges-list nil))
     ; (num-tps 0)
     ; (init-max-n 0)
     ; (init-max-k 0)
@@ -269,10 +310,10 @@
                (setf (negative-tp-vec stnu) (make-array (num-tps stnu)))
                (setf (tp-status-vec stnu) (make-array (num-tps stnu)))
                (setf (cl-index-vec stnu) (make-array (num-tps stnu)))
-               (setf (ord-edges stnu) (make-array (num-tps stnu) (num-tps stnu)))
+               (setf (ord-edges stnu) (make-array (list (num-tps stnu) (num-tps stnu))))
                (setf (num-preds stnu)
                      (make-array (num-tps stnu) :initial-element 0))
-               (setf (preds stnu) (make-array (num-tps stnu) (num-tps stnu)))
+               (setf (preds stnu) (make-array (list (num-tps stnu) (num-tps stnu))))
                )
               ((string-equal line "# Num Ordinary Edges")
                ;(format t "num ord edges~%")
@@ -289,8 +330,7 @@
                )
               ((string-equal line "# Ordinary Edges")
                ;(format t "ord edges~%")
-               (ord-edges-helper input stnu)
-
+               (setf ord-edges-list (parse-ord-edges stnu input))
                )
               ((string-equal line "# Contingent Links")
                ;(format t "cls~%")
@@ -298,4 +338,5 @@
                )
               ))
       (close input))
+    (separate-atps-ctps stnu ord-edges-list)
     stnu))
