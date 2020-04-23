@@ -1,3 +1,16 @@
+;; ====================================
+;;  FILE:    new-stnu-2014.lisp
+;;  AUTHOR:  amy oconnell
+;; ====================================
+;;  This file contains a CLOS-based implementation of STNUs
+;;  modified for Morris's 2014 DC-Checking algorithm
+;; =========================================================
+
+(defconstant  *unprocessed* NIL)
+(defconstant  *ancestor* 1)
+(defconstant  *terminated* 2)
+(defconstant *infinity* 100000000)
+
 ;;  The CL struct (contingent link)
 ;; -------------------------------------
 
@@ -30,7 +43,7 @@
 ;;  OUTPUT: edge struct with values set to INPUTS
 ;;  SIDE EFFECT: none
 
-(defun make-ord-edge (from to wt succ-i pred-i)
+(defun make-ord-edge (from to wt pred-i)
   (make-edge :from from :to to :wt wt :pred-index pred-i))
 
 
@@ -74,6 +87,7 @@
    ;; TP-STATUS-VEC - N-item vector of ints
    ;;   indicates status of TP during recurcive back-propagation
    ;;   *unprocessed* *ancestor* or *terminated*
+
    (tp-status-vec
     :accessor tp-status-vec)
 

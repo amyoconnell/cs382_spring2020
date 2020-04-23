@@ -1,8 +1,31 @@
 (load "morris2014.lisp")
 (load "sandbox.lisp")
 (load "parser.lisp")
+(load "../lib/min-heap.lisp")
 
-(setf test_stnu (parse-file "../sample_stnus/dc-2.stnu"))
-;; TODO: move print func from parser 2006 and try it
+(setf dc-2-stnu (parse-file "../sample_stnus/dc-2.stnu"))
+(setf dc-3-stnu (parse-file "../sample_stnus/dc-3.stnu"))
+(setf dc-5-stnu (parse-file "../sample_stnus/dc-5.stnu"))
+(setf ml-2-stnu (parse-file "../sample_stnus/magic-loop-2.stnu"))
+(setf ml-3-stnu (parse-file "../sample_stnus/magic-loop-3.stnu"))
+(setf ml-5-stnu (parse-file "../sample_stnus/magic-loop-5.stnu"))
 ;; turn array of cl lists into cl structs
 ;; implement this bitch
+
+(setf dc-2-results (determine-dc dc-2-stnu))
+(setf dc-3-results (determine-dc dc-3-stnu))
+(setf dc-5-results (determine-dc dc-5-stnu))
+(setf ml-2-results (determine-dc ml-2-stnu))
+(setf ml-3-results (determine-dc ml-3-stnu))
+(setf ml-5-results (determine-dc ml-5-stnu))
+
+;(print-stnu-short test_stnu t)
+;(format t "~A~%" (negative-tp-vec dc-2-stnu))
+(format t "dc-2 dc results: ~A~%" dc-2-results)
+(format t "dc-3 dc results: ~A~%" dc-3-results)
+(format t "dc-5 dc results: ~A~%" dc-5-results)
+(format t "ml-2 dc results: ~A~%" ml-2-results)
+(format t "ml-3 dc results: ~A~%" ml-3-results)
+(format t "ml-5 dc results: ~A~%" ml-3-results)
+;(cl-list-to-struct test_stnu)
+;(print-stnu-short test_stnu t)
