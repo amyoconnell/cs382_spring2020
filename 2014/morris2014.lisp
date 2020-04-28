@@ -1,49 +1,10 @@
-;; original pseudocode from 2014 paper
-;;-------------------------------------------
-; Boolean procedure determineDC()
-;   for each negative node n do
-;     if DCbackprop(n) = false
-;       return false;
-;   return true;
-; end procedure
-
-; Boolean procedure DCbackprop(source)
-;  if ancestor call with same source
-;    return false;
-;  if prior terminated call with source
-;    return true;
-;  distance(source) = 0;
-;  for each node x other than source do
-;    distance(x) = infinity;
-;  PriorityQueue queue = empty;
-;  for each e1 in InEdges(source) do
-;     Node n1 = start(e1);
-;     distance(n1) = weight(e1);
-;     insert n1 in queue;
-; while queue not empty do
-;   pop Node u from queue;
-;   if distance(u) >= 0
-;     Edge e’ = new Edge(u, source);
-;       weight(e’) = distance(u);
-;       add e’ to graph;
-;       continue;
-;   if u is negative node
-;     if DCbackprop(u) = false
-;      return false;
-;   for each e in InEdges(u) do
-;     if weight(e) < 0
-;       continue;
-;     if e is unsuitable
-;       continue;
-;     Node v = start(e);
-;     new = distance(u) + weight(e);
-;     if new < distance(v)
-;       distance(v) = new;
-;       insert v into queue;
-; return true;
-; end procedure
-;;-------------------------------------------
-
+;; ====================================
+;;  FILE:    morris2014.lisp
+;;  AUTHOR:  amy o'connell
+;; ====================================
+;;  This file contains functions needed to run Morris's
+;;  2014 DC-checking algorithm on an STNU
+;; =========================================================
 
 (defun unsuitable (source-tp u edgie stnu)
   (let ((cli (aref (cl-index-vec stnu) source-tp)))
@@ -51,9 +12,6 @@
       (let ((cl (aref (cl-vec stnu) cli)))
         (and (eq u (cont-link-c cl))
             (eq source-tp (edge-from edgie)))))))
-
-;; in lisp:
-
 
 ; Boolean procedure determineDC()
 (defun determine-dc (stnu)

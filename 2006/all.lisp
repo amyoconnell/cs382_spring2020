@@ -32,6 +32,7 @@
 (let ((output (open "../test_output/output.txt" :direction :output
         :if-exists :supersede
         :if-does-not-exist :create)))
+
     (format output "~%========================================================================~%")
   (format output "  Test 1: dc-3.stnu - should be dynamically controllable~%")
       (format output "========================================================================~%")

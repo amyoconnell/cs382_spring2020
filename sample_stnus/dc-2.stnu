@@ -7,7 +7,7 @@ STNU
 # Num Contingent Links
 2
 # Time-Point Names
-A0 C0 A1 C1 X
+X A0 C0 A1 C1
 # Ordinary Edges
 X 12 C0
 C1 11 C0

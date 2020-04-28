@@ -6,18 +6,25 @@ Thursday 2/6:
 Tuesday 2/11:
   - initialized cs382 git repo
 Monday 2/17:
-  - brainstorm plan for implementing Morris' 2006 DC-Checking algorithm
+  - brainstormed plan for implementing Morris' 2006 DC-Checking algorithm
 Tuesday 2/18:
-  - figure out how to parse input stnu files
+  - figured out how to parse input stnu files
 Thurday 2/20:
-  - generate new stnu from parsed inputs
+  - generated new stnu from parsed inputs
 Thursday 2/27:
-  - in class: worry about lack of progress on implementation
+  - in class: worried about lack of progress on implementation
 
 ~ some days ~
 
 4/10/20:
-  - add minimum heap implementation of queue
+  - added minimum heap implementation of queue
 4/11/20:
-  - write results of tests to output file
-  - update README and activity_log
+  - wrote results of tests to output file
+  - updated README and activity_log
+
+~ some more days ~
+
+4/23/20
+  - fixed implementation of morris 2014
+4/24/20
+  - updated README and activity_log

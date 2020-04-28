@@ -1,5 +1,5 @@
 ;; ====================================
-;;  FILE:    morris2006.lisp
+;;  FILE:    morris2006-min-heap.lisp
 ;;  AUTHOR:  amy o'connell
 ;; ====================================
 ;;  This file contains functions needed to run Morris's

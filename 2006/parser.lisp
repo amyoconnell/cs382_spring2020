@@ -194,12 +194,8 @@
 ;; ---------------------------------------
 ;;  function to parse a .stnu file into a NU-STNU instance
 ;; ---------------------------------------
-;;  INPUT:  ETC: instance of EDGES-ETC
-;;          FROM: origin TP
-;;          CLI: destination TP
-;;          WT: edge weight
-;;  OUTPUT: meh
-;;  SIDE EFFECT: destructively modifies ETC to contain a new edge (FROM WT TO)
+;;  INPUT:  DOC: .stnu file name
+;;  OUTPUT: STNU instance matching .stnu FILE 
 
 (defun parse-file (doc)
   (let* ((input (open doc))
