@@ -136,9 +136,23 @@
 ;;  OUTPUT:  a list containing space-separated
 ;;    items in the string
 
-(defun string-to-list (s)
-  (with-input-from-string (in s)
-    (loop for x = (read in nil nil) while x collect x)))
+; (defun string-to-list (s)
+;   (format t "stl~%")
+;   (with-input-from-string (in s)
+;     (format t "142~%")
+;     (loop for x = (read in nil nil) while x collect x))
+;     (format t "done with stl~%")
+;     )
+
+(defun string-to-list (string)
+    "Returns a list of substrings of string
+divided by ONE space each.
+Note: Two consecutive spaces will be seen as
+if there were an empty string between them."
+    (loop for i = 0 then (1+ j)
+          as j = (position #\Space string :start i)
+          collect (subseq string i j)
+          while j))
 
 ;;  MAKE-INDEX-HASH
 ;; ---------------------------------------
@@ -151,6 +165,7 @@
 ;;     to map each element in LISTY to an index
 
 (defun make-index-hash (stnu listy)
+  (format t "make-index-hash started~%")
   (let ((i 0)) ; iterator
     ;; for each item in listy
     (dolist (item listy)
@@ -283,15 +298,19 @@
     (dotimes (cli (num-cls stnu))  ; CLI = list iterator, contingent link index
              ; LINE = next line in .stnu as string (ex: "A 1 3 C")
              (setf line (read-line input nil))
+             (format t "301~%")
              ; LINE-LIST = LINE converted to list (ex: '(A 1 3 C))
              (setf line-list (string-to-list line))
              ; A-I, C-I = TP indexes for activation and contingent TPs
+             (format t "301~%")
              (setf a-i (gethash (first line-list) (tp-hash stnu)))
              (setf c-i (gethash (fourth line-list) (tp-hash stnu)))
              ; make cont-link struct, add to STNU's CL-VEC at index CLI
+             (format t "301~%")
              (setf (aref (cl-vec stnu) cli)
                    (list a-i (second line-list) (third line-list) c-i))
              ; store CLI for new cont-link at index C-I in STNU's CL-INDEX-VEC
+             (format t "313~%")
              )))
 
 ;;  PARSE-FILE
@@ -310,6 +329,8 @@
     (when input
       (loop for line = (read-line input nil)
             while line do
+            (format t line)
+            (format t "~%")
             (cond
               ;; Case 1: kind of network:
               ;; only working with STNU's - don't do anything
@@ -341,11 +362,14 @@
               ;; add vector of cont-link structs to STNU
                (cont-links-helper input stnu)
                )))
+      (format t "365~%")
       (close input))
     ;; convert current STNU to format suitable for morris2014
     ;; (separate activation timepoints with multiple cont. links)
     ;; (will also finish initiating all other fields with updated NUM-TPS)
+    (format t "370~%")
     (separate-atps-ctps stnu ord-edges-list)
+    (format t "372~%")
 
     stnu)) ;; The End (parse-file function)
 

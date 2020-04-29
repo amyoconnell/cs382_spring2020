@@ -73,6 +73,7 @@
           (edgie-weight (edge-wt edgie))
           (new-edge (make-ord-edge from to wt succ-i pred-i)))
           (when (< wt edgie-weight)
+          (format t "adding ordinary edge (~A ~A ~A)~%" from wt to)
           (setf (aref (edges etc) from to) new-edge)
           (setf (aref (succs etc) from succ-i) new-edge)
           (setf (aref (preds etc) to pred-i) new-edge)))
@@ -84,6 +85,7 @@
          (pred-i (aref (num-preds etc) to))
          ; make new edge
          (new-edge (make-ord-edge from to wt succ-i pred-i)))
+    (format t "adding ordinary edge (~A ~A ~A)~%" from wt to)
     ; add to EDGES matrix
     (setf (aref (edges etc) from to) new-edge)
     ; add as successor of FROM
@@ -195,7 +197,7 @@
 ;;  function to parse a .stnu file into a NU-STNU instance
 ;; ---------------------------------------
 ;;  INPUT:  DOC: .stnu file name
-;;  OUTPUT: STNU instance matching .stnu FILE 
+;;  OUTPUT: STNU instance matching .stnu FILE
 
 (defun parse-file (doc)
   (let* ((input (open doc))
