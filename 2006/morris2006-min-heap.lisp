@@ -124,7 +124,11 @@
     ;; add uc edge to STNU's UC-EDGES-ETC struct]
     (add-edge-uc (uc-edges-etc stnu)
     ;; from, wt, cli
-    (first edgie) (second edgie) (third edgie)))
+    (first edgie) (second edgie) (third edgie))
+    (format t "adding UC edge (~A ~A ~A)~%" (first edgie) (third edgie)
+      (cont-link-a (aref (cl-vec stnu) (second edgie)))
+      )
+    )
   )
 
 ;; IS-DC
@@ -136,6 +140,8 @@
 ;;          T otherwise
 
 (defun is-dc (stnu)
+
+(format t " ~%~%~% HEADING !!!!! ~%~%~% ")
 
   ;; for each contingent link in STNU (k = number of cl's in STNU)
   (dotimes (i (num-cls stnu)) ; for i=0 to i=k-1 (we don't use i)
@@ -291,9 +297,10 @@
                                                    ;; from pseudocode: uc-edge-acc += (a, CC:xx+rpl, aa)
                                                    ;; we use cli instead of aa to make uc-add-edge happy
                                                    (t
-                                                     (if (not (eq a aa))
+                                                     (when (not (eq a aa))
                                                    (setf uc-edge-acc
-                                                     (cons (list a cli (+ min rpl2)) uc-edge-acc)))))
+                                                     (cons (list a cli (+ min rpl2)) uc-edge-acc))
+                                                     )))
                                                    ))
                                                    ))
                                  ))   ;; End of WHILE
@@ -312,11 +319,10 @@
     ;(format t "is-dc: ~A~%" pf)
     (return-from is-dc pf)
 
-    ; (if (not pf)
-    ; (format t "negatlive loops. not dc. this is so sad.~%")
-    ; ;; else: no negative loops! Return TRUE
-    ; (format t "no negative loops. is dc. woot woot~%"))
+    (if (not pf)
+    (format t "negatlive loops. not dc. this is so sad.~%")
+    ;; else: no negative loops! Return TRUE
+    (format t "no negative loops. is dc. woot woot~%"))
     )
-
 
   ) ;; The End
