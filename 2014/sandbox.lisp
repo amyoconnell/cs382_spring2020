@@ -69,7 +69,7 @@
    ;;    KEY is a symbol (name), VALUE is the corresponding number
 
    (tp-hash
-    :accessor tp-hash :initform (make-hash-table))
+    :accessor tp-hash :initform (make-hash-table :test #'equal))
 
    ;;  TP-NAMES-VEC
    ;;    each ith TP index holds the corresponding TP SYMBOL

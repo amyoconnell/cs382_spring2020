@@ -29,14 +29,25 @@
         (cont-link-veck (cl-vec stnu))
         (atp-vec (make-array (+ n k) :initial-element nil))
         (new-names ()))
+    (format t "32~%")
     ;; separate the ATPs
     (dotimes (i k)
              (let* ((cont-link (svref cont-link-veck i))
                     (atp (first cont-link))
-                    (already-used? (svref atp-vec atp)))
+                    (already-used? (svref atp-vec atp))
+                    )
+
+
+                    (format t "atp: ~A~%" atp)
+
+                    (format t "39~%")
+
                (cond
                  ;; Case 1:  That TP is an ATP for a previously encountered cont link
                  (already-used?
+
+                   (format t "41~%")
+
                   ;; set the ATP for this cont-link to a new time-point with index n
                   (setf (svref cont-link-veck i)
                         (cons n (rest cont-link)))
@@ -50,6 +61,9 @@
                   (incf n))
                  ;; Case 2:  That TP is available for use as ATP for current cont link
                  (t
+
+                   (format t "58~%")
+
                   ;; record that fact in ATP-VEC
                   (setf (svref atp-vec atp) i)))))
 
@@ -59,6 +73,9 @@
                     (ctp (fourth cont-link))
                     (is-an-atp? (svref atp-vec ctp)))
                (when is-an-atp?
+
+                 (format t "70~%")
+
                  ;; Note:  IS-AN-ATP? equals the index to the other cont link
                  (let* ((other-cont-link (svref cont-link-veck is-an-atp?)))
                    ;; Set the ATP for other-cont-link to be a new time-point with index n
@@ -76,10 +93,15 @@
                    ;; Increment n
                    (incf n)))))
 
+     (format t "89~%")
+
     ;; Create new-names-vec
     (let (new-names-vec)
       (cond
         ((> n orig-n)
+
+             (format t "103~%")
+
          (setf new-names-vec (make-array n))
          (dotimes (i orig-n)
                   (setf (svref new-names-vec i) (svref tp-names i)))
@@ -90,7 +112,14 @@
                    (setf (gethash elt (tp-hash stnu)) i)
                    (incf i))))
         (t
+
+               (format t "116~%")
+
          (setf new-names-vec tp-names)))
+
+
+              (format t "121~%")
+
 
       ;; update necessary fields in STNU
       (setf (cl-index-vec stnu) atp-vec)
@@ -98,7 +127,16 @@
       (setf (tp-names-vec stnu) new-names-vec)
       (setf (num-ord-edges stnu) (length ord-edges-list))
 
+
+           (format t "131~%")
+
+
       (setf ord-edges-list (make-cl-ord-edges stnu ord-edges-list))
+
+
+           (format t "137~%")
+
+
       (cl-list-to-struct stnu)
       (format t "ord-edges-list: ~A~%" ord-edges-list)
 
@@ -144,15 +182,38 @@
 ;     (format t "done with stl~%")
 ;     )
 
-(defun string-to-list (string)
-    "Returns a list of substrings of string
-divided by ONE space each.
-Note: Two consecutive spaces will be seen as
-if there were an empty string between them."
-    (loop for i = 0 then (1+ j)
-          as j = (position #\Space string :start i)
-          collect (subseq string i j)
-          while j))
+(defun string-to-list (s)		 ; (defun string-to-list (s)
+   (with-input-from-string (in s)		 ;   (format t "stl~%")
+     (loop for x = (read in nil nil) while x collect x)))
+
+; (defun string-to-list (string)
+;     "Returns a list of substrings of string
+; divided by ONE space each.
+; Note: Two consecutive spaces will be seen as
+; if there were an empty string between them."
+;     (loop for i = 0 then (1+ j)
+;           as j = (position #\Space string :start i)
+;           collect (subseq string i j)
+;           while j))
+
+; (defun splitty-acc
+;     (strng acc)
+;   (let ((str (string-trim " " strng))
+;         )
+;     (cond
+;      ((string= "" str)
+;       acc)
+;      (t
+;       (let ((i 0)
+;             (len (length str)))
+;         (while (and (< i len)
+;                     (not (eq (aref str i) #\Space)))
+;           (incf i))
+; 	(splitty-acc (subseq str i) (cons (read-from-string (subseq str 0 i)) acc)))))))
+;
+; (defun string-to-list
+;     (str)
+;   (splitty-acc str ()))
 
 ;;  MAKE-INDEX-HASH
 ;; ---------------------------------------
@@ -169,6 +230,9 @@ if there were an empty string between them."
   (let ((i 0)) ; iterator
     ;; for each item in listy
     (dolist (item listy)
+
+            (format t "item: ~A~%" item)
+
             ;; insert item in hashy with key i
             (setf (gethash item (tp-hash stnu)) i)
             ;; put item at index i in tp-names-vec
@@ -224,7 +288,7 @@ if there were an empty string between them."
   (dotimes (i (num-ord-edges stnu)) ; iterate through each ORD-EDGE in .stnu
   (let* (
         ; LINE = next line in .stnu as string (ex: "A 5 C")
-        (line (read-line input nil))
+        (line (remove #\' (read-line input nil)))
         ; LINE-LIST = LINE converted to list (ex: '(A 5 C))
          (line-list (string-to-list line))
          ; FROM-I, TO-I = TP indexes for FROM and TO TPs
@@ -297,14 +361,30 @@ if there were an empty string between them."
     ; iterate through each CL in .stnu
     (dotimes (cli (num-cls stnu))  ; CLI = list iterator, contingent link index
              ; LINE = next line in .stnu as string (ex: "A 1 3 C")
-             (setf line (read-line input nil))
+             (setf line (remove #\' (read-line input nil)))
              (format t "301~%")
              ; LINE-LIST = LINE converted to list (ex: '(A 1 3 C))
              (setf line-list (string-to-list line))
+
+             (format t "cl list: ~A~%" line-list)
+
+             (format t "does ~A equal ~A?: ~A~%"
+                (first line-list) (aref (tp-names-vec stnu) 2)
+                (eql (first line-list) (aref (tp-names-vec stnu) 2)))
+                ;
+                ; (format t (first line-list))
+                ; (format t (aref (tp-names-vec stnu) 2))
+
              ; A-I, C-I = TP indexes for activation and contingent TPs
              (format t "301~%")
              (setf a-i (gethash (first line-list) (tp-hash stnu)))
+
+             (format t "a-i: ~A~%" a-i)
+
              (setf c-i (gethash (fourth line-list) (tp-hash stnu)))
+
+             (format t "c-i: ~A~%" c-i)
+
              ; make cont-link struct, add to STNU's CL-VEC at index CLI
              (format t "301~%")
              (setf (aref (cl-vec stnu) cli)
@@ -352,7 +432,10 @@ if there were an empty string between them."
               ((string-equal line "# Time-Point Names")
                ;; add current TPs to hash table, save names in TP-names-vec
                ;; will add new TPs as they are created
-               (make-index-hash stnu (string-to-list (read-line input nil)))
+               ; (make-index-hash stnu (string-to-list (read-line input nil)))
+               (make-index-hash stnu (string-to-list
+                 (remove #\' (read-line input nil))))
+               (format t "index-hash: ~A~%" (tp-hash stnu))
                )
               ((string-equal line "# Ordinary Edges")
                 ;; parse edges into a list of (FROM WT TO) - save for later
