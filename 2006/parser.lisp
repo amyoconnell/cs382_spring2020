@@ -115,7 +115,7 @@
          (to-i nil))
     (dotimes (n (num-ord-edges stnu)) ; iterate through each ORD-EDGE in .stnu
              ; LINE = next line in .stnu as string (ex: "A 5 C")
-             (setf line (read-line input nil))
+             (setf line (remove #\' (read-line input nil)))
              ; LINE-LIST = LINE converted to list (ex: '(A 5 C))
              (setf line-list (string-to-list line))
              ; FROM-I, TO-I = TP indexes for FROM and TO TPs
@@ -173,7 +173,7 @@
     ; iterate through each CL in .stnu
     (dotimes (cli (num-cls stnu))  ; CLI = list iterator, contingent link index
              ; LINE = next line in .stnu as string (ex: "A 1 3 C")
-             (setf line (read-line input nil))
+             (setf line (remove #\' (read-line input nil)))
              ; LINE-LIST = LINE converted to list (ex: '(A 1 3 C))
              (setf line-list (string-to-list line))
              ; A-I, C-I = TP indexes for activation and contingent TPs
@@ -233,7 +233,8 @@
                )
               ((string-equal line "# Time-Point Names")
 		;(format t "tp names~%")
-               (make-index-hash stnu (string-to-list (read-line input nil)))
+               (make-index-hash stnu (string-to-list
+                 (remove #\' (read-line input nil))))
                )
               ((string-equal line "# Ordinary Edges")
 		;(format t "ord edges~%")
