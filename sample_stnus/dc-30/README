@@ -1,0 +1,14 @@
+STNU RANDOM INSTANCE BENCHMARK
+==============================
+
+This directory contains 0010 dynamic controllable (DC) STNU random instances.
+Each instance is built generating by a random process tuned by the following parameters.
+The parameter values used for generating the instances are:
+#nodes:				 200
+#contingent:		  30
+#nodeOutdegree:		   4
+#nodeInDegree:		   4
+#edgeProbability:	0.04
+#max weight:		 100
+#max contingent w.:	  20
+
