@@ -15,6 +15,40 @@
 (load "parser.lisp")
 (load "morris2006-min-heap.lisp")
 
+(setf test-file
+  (open "../test_output/big-test-output2006.txt"
+  :direction :output :if-exists :append))
+
+(defun test-dir (dir-name)
+(let ((results-acc nil))
+(dotimes (n 10)
+  (let* ((filename (concatenate 'string
+    "../sample_stnus/" dir-name
+    "/00" (write-to-string n) ".plainStnu"))
+    (stnu (parse-file filename))
+    (results (is-dc stnu)))
+
+    ; (format t "~A file ~A dc results: ~A~%"
+    ;     dir-name n results)
+    (push (list n results) results-acc)
+    ))
+
+(dolist (result (reverse results-acc))
+  (format test-file "~A file ~A dc results: ~A~%"
+      dir-name (first result) ((not (not second result)))))))
+
+; (test-dir "dc-10")
+; (test-dir "dc-20")
+; (test-dir "dc-30")
+; (test-dir "dc-40")
+; (test-dir "ndc-10")
+(test-dir "ndc-20")
+; (test-dir "ndc-30")
+; (test-dir "ndc-40")
+
+
+(close test-file)
+
 (defun test-stnu-to-file (stnu_file output)
   (let ((stnu (parse-file stnu_file)))
     (format output "~%Before Propagation:~%~%")
