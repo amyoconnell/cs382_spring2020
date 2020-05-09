@@ -1,69 +1,150 @@
 (load "morris2014.lisp")
-(load "sandbox.lisp")
+(load "new-stnu-2014.lisp")
 (load "parser.lisp")
 (load "../lib/min-heap.lisp")
 
-(setf test-file
-  (open "../test_output/big-test-output.txt"
-  :direction :output :if-exists :append))
+;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+;;  HELPFUL TESTING FUNCTIONS
+;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-(defun test-dir (dir-name)
-(let ((results-acc nil))
-(dotimes (n 10)
-  (let* ((filename (concatenate 'string
-    "../sample_stnus/" dir-name
-    "/00" (write-to-string n) ".plainStnu"))
-    (stnu (parse-file filename))
-    (results (determine-dc stnu)))
+;;  TEST-STNU-TO-FILE
+;; ---------------------------------------
+;;  function to dc test an .stnu file
+;; ---------------------------------------
+;;  INPUT:  STNU_FILE: a .stnu file
+;;          OUTPUT: output file to print results to
+;;  OUTPUT: meh
+;;  SIDE EFFECT: writes results of dc tests in OUTPUT
 
-    ; (format t "~A file ~A dc results: ~A~%"
-    ;     dir-name n results)
-    (push (list n results) results-acc)
-    ))
+(defun test-stnu-to-file (stnu_file output)
+  (let (; STNU: stnu instance from STNU_FILE
+        (stnu (parse-file stnu_file)))
 
-(dolist (result results-acc)
-  (format test-file "~A file ~A dc results: ~A~%"
-      dir-name (first result) (second result)))))
+    ;; pretty print STNU contents before DC testing propagation to OUTPUT
+    (format output "~%Before Propagation:~%~%")
+    (print-stnu-short stnu output)
 
-(test-dir "dc-10")
-(test-dir "dc-20")
-(test-dir "dc-30")
-(test-dir "dc-40")
-(test-dir "ndc-10")
-(test-dir "ndc-20")
-(test-dir "ndc-30")
-(test-dir "ndc-40")
+    ;; print DC test results
+    (if (determine-dc stnu)
+        (format output "~%Test STNU is dynamically controllable~%~%")
+        (format output "~%Test STNU is not dynamically controllable~%~%"))
 
+    ;; pretty print updated STNU contents after DC testing
+    ;; propagation to OUTPUT
+    (format output "~%After Propagation:~%~%")
+    (print-stnu-short stnu output)))
 
-(close test-file)
+;;  TEST-STNU
+;; ---------------------------------------
+;;  function to dc test an .stnu file
+;; ---------------------------------------
+;;  INPUT:  STNU_FILE: a .stnu file
+;;  OUTPUT: meh
+;;  SIDE EFFECT: prints results of dc test to terminal
 
+(defun test-stnu (stnu_file)
+  (test-stnu-to-file stnu_file t))
 
-; (setf dc-2-stnu (parse-file "../sample_stnus/dc-2.stnu"))
-; (setf dc-3-stnu (parse-file "../sample_stnus/dc-3.stnu"))
-; (setf dc-5-stnu (parse-file "../sample_stnus/dc-5.stnu"))
-; (setf ml-2-stnu (parse-file "../sample_stnus/magic-loop-2.stnu"))
-; (setf ml-3-stnu (parse-file "../sample_stnus/magic-loop-3.stnu"))
-; (setf ml-5-stnu (parse-file "../sample_stnus/magic-loop-5.stnu"))
-; (setf dc-big-stnu (parse-file "../sample_stnus/big_test.stnu"))
-;; turn array of cl lists into cl structs
+;;  TEST-DIR
+;; ---------------------------------------
+;;  function to dc test a directory of .stnu files
+;; ---------------------------------------
+;;  INPUT:  DIR-NAME: a directory name
+;;          TEST-FILE: output file to print results to
+;;  OUTPUT: meh
+;;  SIDE EFFECT: writes results of dc tests in TEST-FILE
 
-; (setf dc-2-results (determine-dc dc-2-stnu))
-; (setf dc-3-results (determine-dc dc-3-stnu))
-; (setf dc-5-results (determine-dc dc-5-stnu))
-; (setf ml-2-results (determine-dc ml-2-stnu))
-; (setf ml-3-results (determine-dc ml-3-stnu))
-; (setf ml-5-results (determine-dc ml-5-stnu))
-; (setf dc-big-results (determine-dc dc-big-stnu))
+(defun test-dir (dir-name test-file)
+  ;; for each file in DIR-NAME
+  (dotimes (n 10)
+           (let* (;; FILE-NAME: string -> name of nth file in DIR
+                  (filename (concatenate 'string
+                                         "../sample_stnus/" dir-name
+                                         "/00" (write-to-string n) ".plainStnu"))
+                  (stnu (parse-file filename)) ; STNU: stnu instance from filename
+                  (result (determine-dc stnu))) ; RESULT: bool -> is STNU in filename DC?
 
+             ;; pretty print result to test-file
+             (format test-file "~A file ~A dc result: ~A~%"
+                     dir-name n result)
+             ))
 
-;(print-stnu-short test_stnu t)
-;(format t "~A~%" (negative-tp-vec dc-2-stnu))
-; (format t "dc-2 dc results: ~A~%" dc-2-results)
-; (format t "dc-3 dc results: ~A~%" dc-3-results)
-; (format t "dc-5 dc results: ~A~%" dc-5-results)
-; (format t "ml-2 dc results: ~A~%" ml-2-results)
-; (format t "ml-3 dc results: ~A~%" ml-3-results)
-; (format t "ml-5 dc results: ~A~%" ml-3-results)
-; (format t "dc-big dc results: ~A~%" dc-big-results)
-;(cl-list-to-struct test_stnu)
-;(print-stnu-short test_stnu t)
+             (format test-file "~%"))
+
+;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+;;  ACTUAL TESTS
+;; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+;; ---------------------------------------
+;;  200 TP Tests
+;; ---------------------------------------
+
+;; 200 TP test output file: BIG-TEST-OUTPUT2006.TXT
+;; TEST-FILE: 200 TP test file stream
+
+(let ((test-file
+       (open "../test_output/big-test-output2014.txt"
+             :direction :output :if-exists :append :if-does-not-exist :create)))
+
+  ;; *** These tests take ~1 minute to run ***
+
+  ;; Pre-generated results can be found in
+  ;; ../test_output/big-test-output2014.txt
+
+  (test-dir "dc-10" test-file)
+  (test-dir "dc-20" test-file)
+  (test-dir "dc-30" test-file)
+  (test-dir "dc-40" test-file)
+  (test-dir "ndc-10" test-file)
+  (test-dir "ndc-20" test-file)
+  (test-dir "ndc-30" test-file)
+  (test-dir "ndc-40" test-file)
+
+  (close test-file))
+
+;; ---------------------------------------
+;;  Small Tests
+;; ---------------------------------------
+
+;; small test output file: output.txt
+(let (; OUTPUT: small test file stream
+      (output (open "../test_output/small-test-output2014.txt" :direction :output
+                    :if-exists :supersede
+                    :if-does-not-exist :create)))
+
+  (format output "~%========================================================================~%")
+  (format output "  dc-2.stnu - should be dynamically controllable~%")
+  (format output "========================================================================~%")
+  (test-stnu-to-file "../sample_stnus/dc-2.stnu" output)
+
+  (format output "~%========================================================================~%")
+  (format output "  dc-3.stnu - should be dynamically controllable~%")
+  (format output "========================================================================~%")
+  (test-stnu-to-file "../sample_stnus/dc-3.stnu" output)
+
+  (format output "~%========================================================================~%")
+  (format output "  dc-5.stnu - should be dynamically controllable~%")
+  (format output "========================================================================~%")
+  (test-stnu-to-file "../sample_stnus/dc-5.stnu" output)
+
+  (format output "~%========================================================================~%")
+  (format output "  magic-loop-2.stnu - should not be dynamically controllable~%")
+  (format output "========================================================================~%")
+  (test-stnu-to-file "../sample_stnus/magic-loop-2.stnu" output)
+
+  (format output "~%========================================================================~%")
+  (format output "  magic-loop-3.stnu - should not be dynamically controllable~%")
+  (format output "========================================================================~%")
+  (test-stnu-to-file "../sample_stnus/magic-loop-3.stnu" output)
+
+  (format output "~%========================================================================~%")
+  (format output "  magic-loop-5.stnu - should not be dynamically controllable~%")
+  (format output "========================================================================~%")
+  (test-stnu-to-file "../sample_stnus/magic-loop-5.stnu" output)
+
+  (format output "~%========================================================================~%")
+  (format output "  morris2006.stnu (from Morris Paper) - should not be dynamically controllable~%")
+  (format output "========================================================================~%")
+  (test-stnu-to-file "../sample_stnus/morris2006.stnu" output)
+
+  (close output))
