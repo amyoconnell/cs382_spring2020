@@ -61,41 +61,55 @@
 ;;          TO: destination TP
 ;;          WT: edge weight
 ;;  OUTPUT: meh
-;;  SIDE EFFECT: destructively modifies ETC to contain a new edge (FROM WT TO)
+;;  SIDE EFFECT: destructively modifies ETC to contain
+;;               a new edge (FROM WT TO) **ONLY if there is
+;;               not already an edge between FROM and TO
+;;               with a lower weight than WT**
 
 (defun add-ord-edge (etc from to wt)
   ;; if there's already an edge (from to)
   (if (aref (edges etc) from to)
-  (let* (
+  (let* ( ;; EDGIE: current edge between FROM and TO
           (edgie (aref (edges etc) from to))
+          ;; SUCC-I: succ-i of current edge
           (succ-i (edge-succ-index edgie))
+          ;; PRED-I: pred-i of current edge
           (pred-i (edge-pred-index edgie))
+          ;; EDGIE-WEIGHT: weight of current edge
           (edgie-weight (edge-wt edgie))
+          ;; NEW-EDGE: new edge struct (FROM WT TO)
+          ;; same succ-i and pred-i as current edge (FROM TO)
           (new-edge (make-ord-edge from to wt succ-i pred-i)))
+
+          ;; if new edge weight is less than current edge weight
+          ;; replace current edge with NEW-EDGE
           (when (< wt edgie-weight)
-          (format t "adding ordinary edge (~A ~A ~A)~%" from wt to)
+          ; add NEW-EDGE to EDGES matrix in ETC
           (setf (aref (edges etc) from to) new-edge)
+          ; replace EDGIE with NEW-EDGE as successor of FROM
           (setf (aref (succs etc) from succ-i) new-edge)
+          ; replace EDGIE with NEW-EDGE as predecessor of TO
           (setf (aref (preds etc) to pred-i) new-edge)))
 
-  ;(format t "edge already exists from ~A to ~A~%" from to)
-  (let* (; inc NUM-SUCCS for FROM
+  ;; else: there is not already an edge between FROM and TO
+  ;; make new edge (FROM WT TO) and insert
+  (let* (; SUCC-I: NUM-SUCCS for FROM
          (succ-i (aref (num-succs etc) from))
-         ; inc NUM-PREDS for TO
+         ; PRED-I: NUM-PREDS for TO
          (pred-i (aref (num-preds etc) to))
-         ; make new edge
+         ; make new edge (FROM WT TO) with SUCC-I and PRED-I
          (new-edge (make-ord-edge from to wt succ-i pred-i)))
-    (format t "adding ordinary edge (~A ~A ~A)~%" from wt to)
-    ; add to EDGES matrix
+
+    ; add NEW-EDGE to EDGES matrix in ETC
     (setf (aref (edges etc) from to) new-edge)
-    ; add as successor of FROM
+    ; add NEW-EDGE as successor of FROM
     (setf (aref (succs etc) from succ-i) new-edge)
     ; increment FROM's number of successors
     (incf (aref (num-succs etc) from))
-    ; add as predecessor of TO
+    ; add NEW-EDGE as predecessor of TO
     (setf (aref (preds etc) to pred-i) new-edge)
     ; increment TO's number of predecessors
-    (incf (aref (num-preds etc) to)))))
+    (incf (aref (num-preds etc) to))))) ; END add-ord-edge
 
 ;;  ORD-EDGES-HELPER
 ;; ---------------------------------------
@@ -105,15 +119,18 @@
 ;;          INPUT: .stnu stream
 ;;  OUTPUT: meh
 ;;  SIDE EFFECT: produces new EDGES-ETC instance ETC with all ordinary edges
-;;    listed in .stnu file, destructively sets ORD-EDGES-ETC of STNU to ETC
+;;    in .stnu file, destructively sets ORD-EDGES-ETC field of STNU to ETC
 
 (defun ord-edges-helper (input stnu)
   (let* ((etc (make-edges-etc (num-tps stnu))) ; ETC = new EDGES-ETC struct
+        ;; other variables for use in dotimes
          (line nil)
          (line-list nil)
          (from-i nil)
          (to-i nil))
-    (dotimes (n (num-ord-edges stnu)) ; iterate through each ORD-EDGE in .stnu
+
+    ; iterate through each ORD-EDGE in .stnu
+    (dotimes (n (num-ord-edges stnu))
              ; LINE = next line in .stnu as string (ex: "A 5 C")
              (setf line (remove #\' (read-line input nil)))
              ; LINE-LIST = LINE converted to list (ex: '(A 5 C))
@@ -121,17 +138,20 @@
              ; FROM-I, TO-I = TP indexes for FROM and TO TPs
              (setf from-i (gethash (first line-list) (tp-hash stnu)))
              (setf to-i (gethash (third line-list) (tp-hash stnu)))
+
              ; use wrapper to add new edge to ETC
              (add-ord-edge etc
                            from-i to-i (second line-list)))
-    ; change ORD-EDGES-ETC of STNU from NIL to ETC
+
+    ; all ord-edges have been added to ETC
+    ; set ORD-EDGES-ETC of STNU to ETC
     (setf (ord-edges-etc STNU) etc)))
 
 ;;  ADD-EDGE-UC
-;; ---------------------------------------
-;;  helper function to add an edge to EDGES-ETC
-;; ---------------------------------------
-;;  INPUT:  ETC: instance of EDGES-ETC
+;; ------------------------------------------------
+;;  helper function to add an edge to UC-EDGES-ETC
+;; ------------------------------------------------
+;;  INPUT:  ETC: instance of UC-EDGES-ETC
 ;;          FROM: origin TP
 ;;          CLI: destination TP
 ;;          WT: edge weight
@@ -139,16 +159,17 @@
 ;;  SIDE EFFECT: destructively modifies ETC to contain a new edge (FROM WT TO)
 
 (defun add-edge-uc (uc-etc from cli wt)
-  (let* (; inc NUM-SUCCS for FROM
+  (let* (; SUCC-I: NUM-SUCCS for FROM
          (succ-i (aref (num-uc-succs uc-etc) from))
-         ; make new edge
+         ; make new UC-edge
          (new-uc-edge (make-uc-edge :from from :cli cli :wt wt)))
-    ; add to EDGES matrix
+    ; add to EDGES matrix in ETC
     (setf (aref (uc-edges uc-etc) from cli) new-uc-edge)
     ; add as successor of FROM
     (setf (aref (uc-succs uc-etc) from succ-i) new-uc-edge)
-	(incf (aref (num-uc-succs uc-etc) from))
-	))
+    ;; increment FROM's number of UC successors
+    (incf (aref (num-uc-succs uc-etc) from))
+    ))
 
 ;;  CONT-LINKS-HELPER
 ;; ---------------------------------------
@@ -165,7 +186,9 @@
 ;;    links in .stnu file, destructively sets UC-EDGES-ETC of STNU to ETC
 
 (defun cont-links-helper (input stnu)
-  (let* ((uc-etc (make-uc-edges-etc (num-tps stnu) (num-cls stnu))) ; ETC = new EDGES-ETC struct
+  (let* (; UC-ETC = new UC-EDGES-ETC instance
+    (uc-etc (make-uc-edges-etc (num-tps stnu) (num-cls stnu)))
+        ; set during dotimes
          (line nil)
          (line-list nil)
          (a-i nil)
@@ -200,14 +223,10 @@
 ;;  OUTPUT: STNU instance matching .stnu FILE
 
 (defun parse-file (doc)
-  (let* ((input (open doc))
-         (stnu (make-instance 'nu-stnu))
-         (num-tps 0)
-         (init-max-n 0)
-         (init-max-k 0)
-         (ord-edges nil)
-         (uc-edges nil))
-    ;; iterate through each line of input
+  (let* ((input (open doc)) ; INPUT: .stnu input stream
+         (stnu (make-instance 'nu-stnu))) ; STNU: empty STNU instance
+
+    ;; iterate through each line of input in .stnu file
     (when input
       (loop for line = (read-line input nil)
             while line do
@@ -216,41 +235,49 @@
               ;; only working with STNU's - don't do anything
               ((string-equal line "# Kind of Network")
                (read-line input nil))
-              ;; Case 2: num TPS
+              ;; Case 2: num TPs
               ((string-equal line "# Num Time-Points")
+              ;; set NUM-TPS field in STNU to int on next line
                (setf (num-tps stnu) (parse-integer (read-line input nil)))
+               ;; set TP-NAMES-VEC and CL-INDEX-VEC fields of STNU to
+               ;; NIL vecors of length NUM-TPS
                (setf (tp-names-vec stnu) (make-array (num-tps stnu)))
-               (setf (cl-index-vec stnu) (make-array (num-tps stnu)))
-               )
+               (setf (cl-index-vec stnu) (make-array (num-tps stnu))))
+               ;; Case 3: num ord edges
               ((string-equal line "# Num Ordinary Edges")
-		;(format t "num ord edges~%")
-               (setf (num-ord-edges stnu) (parse-integer (read-line input nil)))
-               )
+              ;; set NUM-ORD-EDGES field of stnu to int on next line
+               (setf (num-ord-edges stnu) (parse-integer (read-line input nil))))
+               ;; Case 4: num cont links
               ((string-equal line "# Num Contingent Links")
-		;(format t "num cls~%")
+              ;; set NUM-CLS field of stnu to int on next line
                (setf (num-cls stnu) (parse-integer (read-line input nil)))
-               (setf (cl-vec stnu) (make-array (num-cls stnu)))
-               )
+               ;; set CL-VEC field of STNU to NIL vecor of length NUM-CLS
+               (setf (cl-vec stnu) (make-array (num-cls stnu))))
+               ;; Case 5: time point names
               ((string-equal line "# Time-Point Names")
-		;(format t "tp names~%")
+              ;; use MAKE-INDEX-HASH function to map TP names to
+              ;; integer indexes in TP-HASH field of STNU
                (make-index-hash stnu (string-to-list
-                 (remove #\' (read-line input nil))))
-               )
+                 ;; remove any single quotes from around TP Names!!
+                 (remove #\' (read-line input nil)))))
+              ;; Case 6: ordinary edges
               ((string-equal line "# Ordinary Edges")
-		;(format t "ord edges~%")
-               (ord-edges-helper input stnu)
-               )
+              ;; use ORD-EDGES-HELPER function to add ordinary edges to STNU
+               (ord-edges-helper input stnu))
+              ;; Case 7: contingent links
               ((string-equal line "# Contingent Links")
-		;(format t "cls~%")
-               (cont-links-helper input stnu)
-               )
-              ))
-      (close input))
+                ;; use CONT-LINKS-HELPER function to add cont links to STNU
+               (cont-links-helper input stnu))
+              ) ; end COND
+              ) ; end LOOP over DOC
+      ;; close .stnu stream
+      (close input)) ; end WHEN INPUT
+
+      ;; return new STNU instance
       stnu
-))
+)) ; THE END (parse-file)
 
-
-
+;; Printing Functions -- self explanatory
 
 (defun print-list (list)
   (while list
@@ -268,7 +295,6 @@
     (format t "ORD EDGES ETC: ~%")
     (print-edges-etc (ord-edges-etc stnu))
     (format t "DMAX EDGES ETC: ~%")
-    ;(print-edges-etc (dmax-edges-etc stnu))
     (format t "UC EDGES ETC: ~%")
     (print-uc-edges-etc (uc-edges-etc stnu))
     (format t "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END STNU %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%~%"))
@@ -284,7 +310,6 @@
     (format file "ORD EDGES ETC: ~%")
     (print-edges-etc-to-file (ord-edges-etc stnu) file)
     (format file "DMAX EDGES ETC: ~%")
-    ;(print-edges-etc (dmax-edges-etc stnu))
     (format file "UC EDGES ETC: ~%")
     (print-uc-edges-etc-to-file (uc-edges-etc stnu) file)
     (format file "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END STNU %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%~%"))
@@ -346,6 +371,4 @@
       (print-cl-to-file (aref (cl-vec stnu) cli) stnu file))
     (format file "~%Edges:")
     (print-edges-from-matrix (ord-edges-etc stnu) stnu file)
-    ;(dotimes (edge-i (num-ord-edges stnu))
-      ;(print-ord-edge-to-file (aref
     (format file "~%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END STNU %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%~%"))

@@ -28,3 +28,9 @@ Thursday 2/27:
   - fixed implementation of morris 2014
 4/24/20
   - updated README and activity_log
+
+~ some more days ~
+
+5/8/20
+  - finished comments
+  - submitted final

@@ -1,0 +1,87 @@
+dc-10 file 0 dc result: T
+dc-10 file 1 dc result: T
+dc-10 file 2 dc result: T
+dc-10 file 3 dc result: T
+dc-10 file 4 dc result: T
+dc-10 file 5 dc result: T
+dc-10 file 6 dc result: T
+dc-10 file 7 dc result: T
+dc-10 file 8 dc result: T
+dc-10 file 9 dc result: T
+
+dc-20 file 0 dc result: T
+dc-20 file 1 dc result: T
+dc-20 file 2 dc result: T
+dc-20 file 3 dc result: T
+dc-20 file 4 dc result: T
+dc-20 file 5 dc result: T
+dc-20 file 6 dc result: T
+dc-20 file 7 dc result: T
+dc-20 file 8 dc result: T
+dc-20 file 9 dc result: T
+
+dc-30 file 0 dc result: T
+dc-30 file 1 dc result: T
+dc-30 file 2 dc result: T
+dc-30 file 3 dc result: T
+dc-30 file 4 dc result: T
+dc-30 file 5 dc result: T
+dc-30 file 6 dc result: T
+dc-30 file 7 dc result: T
+dc-30 file 8 dc result: T
+dc-30 file 9 dc result: T
+
+dc-40 file 0 dc result: T
+dc-40 file 1 dc result: T
+dc-40 file 2 dc result: T
+dc-40 file 3 dc result: T
+dc-40 file 4 dc result: T
+dc-40 file 5 dc result: T
+dc-40 file 6 dc result: T
+dc-40 file 7 dc result: T
+dc-40 file 8 dc result: T
+dc-40 file 9 dc result: T
+
+ndc-10 file 0 dc result: NIL
+ndc-10 file 1 dc result: T
+ndc-10 file 2 dc result: T
+ndc-10 file 3 dc result: NIL
+ndc-10 file 4 dc result: NIL
+ndc-10 file 5 dc result: NIL
+ndc-10 file 6 dc result: T
+ndc-10 file 7 dc result: T
+ndc-10 file 8 dc result: T
+ndc-10 file 9 dc result: NIL
+
+ndc-20 file 0 dc result: T
+ndc-20 file 1 dc result: NIL
+ndc-20 file 2 dc result: NIL
+ndc-20 file 3 dc result: T
+ndc-20 file 4 dc result: T
+ndc-20 file 5 dc result: T
+ndc-20 file 6 dc result: T
+ndc-20 file 7 dc result: NIL
+ndc-20 file 8 dc result: NIL
+ndc-20 file 9 dc result: NIL
+
+ndc-30 file 0 dc result: NIL
+ndc-30 file 1 dc result: T
+ndc-30 file 2 dc result: NIL
+ndc-30 file 3 dc result: T
+ndc-30 file 4 dc result: T
+ndc-30 file 5 dc result: T
+ndc-30 file 6 dc result: NIL
+ndc-30 file 7 dc result: NIL
+ndc-30 file 8 dc result: T
+ndc-30 file 9 dc result: NIL
+
+ndc-40 file 0 dc result: NIL
+ndc-40 file 1 dc result: NIL
+ndc-40 file 2 dc result: NIL
+ndc-40 file 3 dc result: NIL
+ndc-40 file 4 dc result: NIL
+ndc-40 file 5 dc result: NIL
+ndc-40 file 6 dc result: T
+ndc-40 file 7 dc result: NIL
+ndc-40 file 8 dc result: T
+ndc-40 file 9 dc result: T
